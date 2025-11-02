@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>何为朝朝</title>
+  <title>何为朝朝.html 2025年11月2日</title>
   <style>
     body {
       background-color: #f5f5f5;
@@ -13,6 +13,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      /* 初始背景图（轮播启动前显示） */
+      background-image: url(images/20251102105921.jpg); 
+      background-size: cover; /* 图片覆盖全屏 */
+      background-position: center; /* 图片居中 */
+      background-repeat: no-repeat; /* 禁止重复 */
+      background-attachment: fixed; /* 固定背景不偏移 */
+      transition: background-image 1s ease; /* 图片切换过渡动画 */
     }
     .gift-button {
       padding: 15px 30px;
@@ -24,6 +31,7 @@
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
       transition: all 0.3s ease;
+      z-index: 10; /* 确保按钮在背景之上 */
     }
     .gift-button:hover {
       transform: translateY(-3px);
@@ -40,6 +48,7 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       text-align: center;
       display: none;
+      z-index: 20; /* 确保弹窗在最上层 */
     }
     .confirm-modal h3 {
       color: #333;
@@ -73,6 +82,8 @@
       animation: fadeIn 0.5s ease-in-out;
       display: flex;
       flex-direction: column;
+      background-color: rgba(255, 255, 255, 0.9); /* 弹窗半透明，不挡背景 */
+      z-index: 5;
     }
     .popup .tip-label {
       position: absolute;
@@ -101,7 +112,7 @@
 </head>
 <body>
   <!-- 启动按钮 -->
-  <button class="gift-button">一份礼物</button>
+  <button class="gift-button">一份礼物请点击</button>
   
   <!-- 确认弹窗 -->
   <div class="confirm-modal">
@@ -117,8 +128,19 @@
     const confirmBtn = document.querySelector('.confirm-btn');
     let isRunning = false;
     let popupInterval;
+    let bgInterval;
 
-    // 提示语列表
+    // 1. 背景轮播配置 - 替换下方图片名为你的实际图片名（可增减图片数量）
+    const backgroundImages = [
+      "images/20251102105820.jpg",
+      "images/20251102105825.jpg",
+      "images/20251102105843.jpg",
+      "images/2025-05-26 154944.png"
+      
+    ];
+    const carouselTime = 5000; // 轮播间隔时间（毫秒），5000=5秒
+
+    // 2. 提示语列表
     const messages = [
       "多喝水哦~",
       "好好爱自己",
@@ -141,38 +163,52 @@
       "天冷了，多穿衣服"
     ];
 
-    // 生成随机颜色（浅色系）
+    // 3. 背景轮播核心函数
+    function startBackgroundCarousel() {
+      // 随机显示第一张背景图
+      let currentIndex = Math.floor(Math.random() * backgroundImages.length);
+      document.body.style.backgroundImage = `url("${backgroundImages[currentIndex]}")`;
+
+      // 定时切换背景图
+      bgInterval = setInterval(() => {
+        currentIndex = (currentIndex + 1) % backgroundImages.length; // 循环切换
+        document.body.style.backgroundImage = `url("${backgroundImages[currentIndex]}")`;
+      }, carouselTime);
+    }
+
+    // 4. 生成随机颜色（弹窗用）
     function getRandomLightColor() {
       const hue = Math.floor(Math.random() * 360);
       return `hsl(${hue}, 20%, 90%)`;
     }
 
-    // 生成随机位置
+    // 5. 生成弹窗随机位置
     function getRandomPosition() {
       const x = Math.floor(Math.random() * (window.innerWidth - 100));
       const y = Math.floor(Math.random() * (window.innerHeight - 50));
       return { x, y };
     }
 
-    // 创建单个弹窗
+    // 6. 创建单个温馨弹窗
     function createPopup() {
       const message = messages[Math.floor(Math.random() * messages.length)];
       const popup = document.createElement('div');
       popup.className = 'popup';
       popup.style.backgroundColor = getRandomLightColor();
       
-      // 温馨提示标签
+      // 弹窗标签
       const tipLabel = document.createElement('div');
       tipLabel.className = 'tip-label';
       tipLabel.textContent = '温馨提示';
       popup.appendChild(tipLabel);
       
-      // 提示语内容
+      // 弹窗内容
       const messageEl = document.createElement('div');
       messageEl.className = 'message';
       messageEl.textContent = message;
       popup.appendChild(messageEl);
       
+      // 弹窗位置
       const position = getRandomPosition();
       popup.style.left = `${position.x}px`;
       popup.style.top = `${position.y}px`;
@@ -180,25 +216,34 @@
       document.body.appendChild(popup);
     }
 
-    // 开始生成弹窗
+    // 7. 启动弹窗生成（点击"接受"后触发）
     function startPopups() {
       // 隐藏按钮和确认框
       giftButton.style.display = 'none';
       confirmModal.style.display = 'none';
-      // 清空可能存在的弹窗
+      // 清空旧弹窗
       document.querySelectorAll('.popup').forEach(p => p.remove());
-      // 立即生成一个，然后定时生成
+      // 启动弹窗生成
       createPopup();
       popupInterval = setInterval(createPopup, 300);
+      // 启动背景轮播（确保弹窗启动时背景也开始轮播）
+      startBackgroundCarousel();
       isRunning = true;
     }
 
-    // 事件监听
+    // 8. 事件监听
+    // 点击"一份礼物"显示确认框
     giftButton.addEventListener('click', () => {
       confirmModal.style.display = 'block';
     });
 
+    // 点击"接受"启动所有效果
     confirmBtn.addEventListener('click', startPopups);
+
+    // 页面加载时先显示第一张背景图（可选）
+    window.onload = () => {
+      document.body.style.backgroundImage = `url("${backgroundImages[0]}")`;
+    };
   </script>
 </body>
 </html>
