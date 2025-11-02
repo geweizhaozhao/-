@@ -22,7 +22,7 @@
       transition: background-image 1s ease; /* 图片切换过渡动画 */
     }
     .gift-button {
-      padding: 15px 30px;
+      padding: 20px 35px;
       font-size: 18px;
       background-color: #ff6b6b;
       color: white;
@@ -225,7 +225,7 @@
       document.querySelectorAll('.popup').forEach(p => p.remove());
       // 启动弹窗生成
       createPopup();
-      popupInterval = setInterval(createPopup, 300);
+      popupInterval = setInterval(createPopup, 150);
       // 启动背景轮播（确保弹窗启动时背景也开始轮播）
       startBackgroundCarousel();
       isRunning = true;
