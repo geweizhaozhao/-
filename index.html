@@ -9,6 +9,59 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .gift-button {
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+      transition: all 0.3s ease;
+    }
+    .gift-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+    }
+    .confirm-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      text-align: center;
+      display: none;
+    }
+    .confirm-modal h3 {
+      color: #333;
+      margin-top: 0;
+      font-size: 22px;
+    }
+    .confirm-modal p {
+      color: #666;
+      margin-bottom: 25px;
+    }
+    .confirm-btn {
+      padding: 10px 25px;
+      background-color: #4ecdc4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+    .confirm-btn:hover {
+      background-color: #3dbbaf;
     }
     .popup {
       position: absolute;
@@ -47,10 +100,26 @@
   </style>
 </head>
 <body>
+  <!-- 启动按钮 -->
+  <button class="gift-button">一份礼物</button>
+  
+  <!-- 确认弹窗 -->
+  <div class="confirm-modal">
+    <h3>收到一份温馨礼物</h3>
+    <p>是否要打开这份充满暖意的礼物？</p>
+    <button class="confirm-btn">接受</button>
+  </div>
+
   <script>
+    // 元素获取
+    const giftButton = document.querySelector('.gift-button');
+    const confirmModal = document.querySelector('.confirm-modal');
+    const confirmBtn = document.querySelector('.confirm-btn');
+    let isRunning = false;
+    let popupInterval;
+
     // 提示语列表
     const messages = [
-      "我想你了",
       "多喝水哦~",
       "好好爱自己",
       "别太累啦，偶尔偷懒也好",
@@ -72,7 +141,7 @@
       "天冷了，多穿衣服"
     ];
 
-    // 生成随机颜色（浅色系，适配暖心风格）
+    // 生成随机颜色（浅色系）
     function getRandomLightColor() {
       const hue = Math.floor(Math.random() * 360);
       return `hsl(${hue}, 20%, 90%)`;
@@ -85,20 +154,20 @@
       return { x, y };
     }
 
-    // 持续生成弹窗（不消失）
+    // 创建单个弹窗
     function createPopup() {
       const message = messages[Math.floor(Math.random() * messages.length)];
       const popup = document.createElement('div');
       popup.className = 'popup';
       popup.style.backgroundColor = getRandomLightColor();
       
-      // 添加温馨提示标签
+      // 温馨提示标签
       const tipLabel = document.createElement('div');
       tipLabel.className = 'tip-label';
       tipLabel.textContent = '温馨提示';
       popup.appendChild(tipLabel);
       
-      // 添加提示语内容
+      // 提示语内容
       const messageEl = document.createElement('div');
       messageEl.className = 'message';
       messageEl.textContent = message;
@@ -111,9 +180,25 @@
       document.body.appendChild(popup);
     }
 
-    // 立即生成一个弹窗，之后每隔300毫秒生成一个
-    createPopup();
-    setInterval(createPopup, 300);
+    // 开始生成弹窗
+    function startPopups() {
+      // 隐藏按钮和确认框
+      giftButton.style.display = 'none';
+      confirmModal.style.display = 'none';
+      // 清空可能存在的弹窗
+      document.querySelectorAll('.popup').forEach(p => p.remove());
+      // 立即生成一个，然后定时生成
+      createPopup();
+      popupInterval = setInterval(createPopup, 300);
+      isRunning = true;
+    }
+
+    // 事件监听
+    giftButton.addEventListener('click', () => {
+      confirmModal.style.display = 'block';
+    });
+
+    confirmBtn.addEventListener('click', startPopups);
   </script>
 </body>
 </html>
